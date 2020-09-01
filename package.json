@@ -1,0 +1,25 @@
+{
+  "name": "yelp-camp",
+  "version": "1.0.0",
+  "description": "Project for Colt Steele Course (Udemy)",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git"
+  },
+  "author": "Priyaraj",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Priyaraj17/Yelp-Camp/issues"
+  },
+  "homepage": "https://github.com/Priyaraj17/Yelp-Camp#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "bootstrap": "^4.5.2",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "require": "^2.4.20"
+  }
+}
