@@ -1,0 +1,33 @@
+<%- include('partials/header'); -%>
+    <div class="jumbotron mt-5">
+        <header class="container">
+            <h1>This is the Campgrounds page</h1>
+            <p>
+                View our hand-picked campgrounds from all over the world
+            </p>
+            <p>
+                <a href="/campgrounds/new" class="btn btn-primary btn-lg">Add a New Campground</a>
+            </p>
+        </header>
+    </div>
+<div class="container">
+    <div class="row text-center" style="display:flex; flex-wrap:wrap;">
+        <% campgrounds.forEach(function(Campground){ %>
+            <div class="col-md-4 col-sm-6 col-12">
+                  <div class="card" style="width: 18rem;">
+                      <img src="<%=Campground.image%>" alt="" class="card-img">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <%=Campground.name%>
+                        </h5>
+                        <p class="card-text">
+                            <%=Campground.description.substring(0,65)%>...
+                        </p>
+                        <a href="/campgrounds/<%=Campground._id%>" class="btn btn-primary">More Info</a>
+                    </div>
+                  </div>
+            </div>
+            <%}); %>    
+    </div>
+</div>
+<%- include('partials/footer'); -%>
