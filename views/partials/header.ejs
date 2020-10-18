@@ -4,6 +4,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="stylesheet" href="/stylesheets/main.css">
         <title>
             YelpCamp
         </title>
@@ -19,12 +20,21 @@
                 </ul>
                 <div class="collapse navbar-collapse justify-content-end" id="navbarCollapse">
                     <ul class="navbar-nav">
+                      <%if(!currentUser){%>
                       <li class="nav-item">
-                        <a class="nav-link text-light" href="#">Sign Up</a>
+                        <a class="nav-link text-light" href="/register">Sign Up</a>
                       </li>
                         <li class="nav-item">
-                        <a class="nav-link text-light" href="#">Login</a>
+                        <a class="nav-link text-light" href="/login">Login</a>
                       </li>
+                    <%} else {%>
+                      <li class="nav-item">
+                        <a class="nav-link text-light" href="/logout">Logout</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link text-light" href="#"><%=currentUser.username%></a>
+                      </li>
+                    <%}%>
                     </ul>
                   </div>
             </div>

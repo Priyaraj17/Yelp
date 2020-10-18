@@ -1,39 +1,41 @@
 var express    = require("express"),
     mongoose   = require("mongoose"),
     app        = express(),
-    port       = "1000",
-    bodyParser = require("body-parser");
+    bodyParser = require("body-parser"),
+    passport   = require("passport"),
+    LocalStrategy = require("passport-local"),
+    User        =   require("./models/users"),
+    Campground =  require("./models/campground"),
+    Comment    =   require("./models/comment"),
+    seedDB     =  require("./seeds");
 
+    var port="1000";
 mongoose.connect("mongodb://localhost/yelp_camp");
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set('port', port);
 module.exports = app;
 app.set('view engine', 'ejs');
+app.use(express.static(__dirname+"/public"));
 
-//DataBase Schema
+seedDB();
 
-var campgroundSchema= new mongoose.Schema({
-    name:String,
-    image: String,
-    description: String
+app.use(require("express-session")({
+    secret: "Once again I won",
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+app.use(function(req, res, next){
+    res.locals.currentUser=req.user;
+    next();
 });
-
-var Campground = mongoose.model("Campground", campgroundSchema);
-/*
-Campground.create(
-    {
-        name:"Nainital",
-        image:"https://images.unsplash.com/photo-1483381719261-6620dfa2d28a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=755&q=80",
-        description:"It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like)."
-    }, function(err, campground){
-        if(err){
-            console.log(err);
-        }else{
-            console.log("New Campground");
-            console.log(campground);
-        }
-});*/
 
 app.get("/", function(req,res){
     res.render("landing");
@@ -45,7 +47,7 @@ app.get("/campgrounds" ,function(req, res){
         if(err){
             console.log(err);
         }else{
-            res.render("index", {campgrounds: allCampgrounds});
+            res.render("index", {campgrounds: allCampgrounds, currentUser: req.user});
         }
     });
 });
@@ -74,7 +76,7 @@ app.get("/campgrounds/new", function(req, res){
 app.get("/campgrounds/:id", function(req, res){
     //Find the campground with a particular id
     //Render the page
-    Campground.findById(req.params.id, function(err, foundCampground){
+    Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground){
         if(err){
             console.log(err);
         }else{
@@ -84,10 +86,77 @@ app.get("/campgrounds/:id", function(req, res){
 })
 
 
+app.get("/campgrounds/:id/comment/new", isLoggedIn, function(req, res){
+    Campground.findById(req.params.id, function(err, campground){
+        if(err){
+            console.log(err);
+        }else{
+            res.render("comment-new", {campground:campground});
+        }
+    })
+});
+
+app.post("/campgrounds/:id/comments",isLoggedIn, function(req, res){
+    Campground.findById(req.params.id, function(err, campground){
+        if(err){
+            console.log(err);
+        }else{
+            Comment.create(req.body.comment, function(err, text){
+                if(err){
+                    console.log(err);
+                }else{
+                    campground.comments.push(text);
+                    campground.save();
+                    res.redirect('/campgrounds/'+campground._id);
+                }
+            });
+        }
+    });
+});
 
 
+//AUTHENTICATE ROUTES:
+app.get("/register",function(req, res){
+    res.render("register");
+});
+
+app.post("/register", function(req, res){
+    var newUser= new User({username: req.body.username});
+    User.register(newUser, req.body.password, function(err, user){
+        if(err){
+            console.log(err);
+            return res.render("register")
+        }
+        passport.authenticate("local")(req, res, function(){
+            res.redirect("/campgrounds");
+        });
+    });
+});
+
+app.get("/login", function(req, res){
+    res.render("login");
+});
+
+app.post("/login", passport.authenticate("local", 
+    {
+        successRedirect:"/campgrounds",
+        failureRedirect:"/login"
+    }), function(req, res){
+});
+
+app.get("/logout", function(req, res){
+    req.logout();
+    res.redirect("/campgrounds");
+});
+
+function isLoggedIn(req, res, next){
+    if(req.isAuthenticated()){
+        return next();
+    }
+    res.redirect("/login");
+}
 
 app.listen(port, function(err){ 
     if (err) console.log("Error in server setup") 
     console.log("Server listening on Port", port); 
-})
+});
