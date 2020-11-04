@@ -1,0 +1,17 @@
+.edit-form{
+    margin-top:10%;
+    margin-left: 10%;
+    text-align: center;
+}
+.form {
+    width: 550px;
+    margin: 0 auto;
+}
+
+#form-id{
+    display: inline;
+}
+.login{
+    margin-top: 15%;
+    text-align: center;
+}

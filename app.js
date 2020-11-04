@@ -1,13 +1,14 @@
-var express    = require("express"),
-    mongoose   = require("mongoose"),
-    app        = express(),
-    bodyParser = require("body-parser"),
-    passport   = require("passport"),
-    LocalStrategy = require("passport-local"),
-    User        =   require("./models/users"),
-    Campground =  require("./models/campground"),
-    Comment    =   require("./models/comment"),
-    seedDB     =  require("./seeds");
+var express         =     require("express"),
+    mongoose        =     require("mongoose"),
+    app             =     express(),
+    bodyParser      =     require("body-parser"),
+    passport        =     require("passport"),
+    LocalStrategy   =     require("passport-local"),
+    User            =     require("./models/users"),
+    Campground      =     require("./models/campground"),
+    Comment         =     require("./models/comment"),
+    seedDB          =     require("./seeds"),
+    methodOverride  =     require("method-override");
 
     var port="1000";
     var commentRoutes = require("./routes/comments"),
@@ -21,7 +22,7 @@ app.set('port', port);
 module.exports = app;
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname+"/public"));
-
+app.use(methodOverride("_method"));
 //seedDB();
 
 app.use(require("express-session")({
